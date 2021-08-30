@@ -10,13 +10,13 @@ const headers = {
 
 const port = 3000;
 
-// TODO: Fill with strings of your favorite quotes :)
+//Fill with strings of your favorite quotes :)
 const quotes = [
-  'one',
-  'two',
-  'three',
-  'four',
-  'five'
+  'this is a quote',
+  'another quote i like',
+  'what even is a quote',
+  'quote quote quote quotey quote quote',
+  'i should really add some quotes later'
 ];
 
 //Utility Function to return a random integer
@@ -37,13 +37,21 @@ const handleRequest = function(req, res) {
   }
 
   // TODO: GET ONE
-  if ((req.url == '/quote/' || req.url == '/quote') && req.method == "FILL ME IN") {
-    //YOUR CODE HERE
-
+  if ((req.url == '/quote/' || req.url == '/quote') && req.method == "GET") {
+    // Use the getRandomInt to randomly select a quote from the quote array
+    var randomQuotesIndex = getRandomInt(0, quotes.length);
+    // console.log('randomQuotesIndex >>>>>>>>>>>>VALUE>>>>>>>>>>>>>>>> ', randomQuotesIndex);
+    res.writeHead(200, headers);
+    //Be sure to .end
+    res.end(JSON.stringify(quotes[randomQuotesIndex]));
   }
   // TODO: POST/CREATE
-  else if ((req.url == 'FILL ME IN' || req.url == 'FILL ME IN') && req.method == "FILL ME IN") {
+  // Paths should be the same
+  else if ((req.url == '/quote/'  || req.url == '/quote') && req.method == "POST") {
     //YOUR CODE HERE
+
+    //Be sure to .end
+    res.end();
   }
 
 //CATCH ALL ROUTE
