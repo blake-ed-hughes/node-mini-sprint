@@ -12,10 +12,12 @@ $(document).ready(function() {
 
   function getQuote(successCB, errorCB = null){
     // $.get('http://localhost:3000/quote', data => {console.log('DATA:', data)});
+
     //YOUR CODE HERE, Add a GET request
     $.ajax({
       url:'http://localhost:3000/quote',
       type: 'GET',
+      //dataType not contentType!!!
       dataType: 'json',
       success: function (data) {
         console.log('DATA:', data);
@@ -34,7 +36,7 @@ $(document).ready(function() {
       url: 'http://localhost:3000/quote',
       type: 'POST',
       data: quote,
-      dataType: 'json',
+      contentType: 'json',
       success: function (data) {
         console.log('DATA:', data)
       },
