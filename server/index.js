@@ -1,6 +1,6 @@
 var express = require('express');
 var cors = require('cors');
-
+var path = require('path');
 var app = express();
 
 const port = 3000;
@@ -16,8 +16,8 @@ const port = 3000;
 // };
 
 app.use(cors());
-
-// app.use(express.static('client/dist'));
+// app.use(express.json());
+app.use('/', express.static(path.join(__dirname, '../react-client/dist')));  // <<<<<<<<<'/../react-client/dist'<<<<<<<< IS THIS THE RIGHT SUB DIRECTORY?
 
 //Fill with strings of your favorite quotes :)
 var quotes = [
