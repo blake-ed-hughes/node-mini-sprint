@@ -1,64 +1,84 @@
+// const promise = require('bluebird');
 var mysql = require('mysql');
-var Connection = mysql.createConnection({
+var connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'iamroot!',
   database: 'randomQuote'
 });
 
-Connection.connect(
+connection.connect(
   (err) => {
     if (err) {
-      console.log('ERROR, ERROR setting up dbConnection!')
+      console.log('ERROR, ERROR setting up connection in db index!')
     } else {
       console.log('Connected to Blake\'s database!')
     }
   }
 );
 
-//Utility Function to return a random integer
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
-}
-
-// get random quote
-
-getRandQuote = (callback) => {
-  var integer = 'SELECT COUNT(*) FROM quoteList';
-  var queryparam = getRandomInt(0, integer);
-  var querystring = 'SELECT * FROM quoteList WHERE id = ?';
-  Connection.query(querystring, queryparam,(err, result) => {
+// get quote count from db
+var getQuoteCount = (callback) => {
+  var querystring = 'SELECT COUNT(*) FROM quoteList';
+  connection.query(querystring, (err, resultCount) => {
     if (err) {
-    console.log('Error Getting Random Quote from Database-->', result);
-    callback(err, null);
+      callback(err, null);
     } else {
-    console.log('Successfully Got Random Quote from Database -->', result);
-    callback(null, result);
+      callback(null, resultCount[0]['COUNT(*)']);
     }
   });
 };
 
-// add my new quote
+//Utility Function to return a random integer
+//The maximum is exclusive and the minimum is inclusive
+var getRandomInt = (min, max) => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+};
 
-addNewQuote = (newQuote, callback) => {
-  var queryparam = [newQuote];
-  var querystring = "INSERT INTO quoteList(quote) VALUES ('?')";
-  Connection.query(querystring, queryparam,(err, result) => {
+// get random quote from db
+var getRandQuote = (callback) => {
+
+  getQuoteCount((err,resultCount) => {
     if (err) {
-    console.log('Error Inserting New Quote into Database-->', result);
+      console.log('Error in nested getQuoteCount --> ', err);
     callback(err, null);
     } else {
-    console.log('Successfully Inserted New Quote -->', result);
-    callback(null, result);
+      // random integer within quote count range
+      var randomInteger = getRandomInt(0, resultCount);
+      var queryparam = [randomInteger];
+      var querystring = 'SELECT quote FROM quoteList WHERE quoteId = ?';
+      connection.query(querystring, queryparam,(err, result) => {
+        if (err) {
+          console.log('Error getting random quote from database query -->', err);
+          callback(err, null);
+        } else {
+          console.log('Successfully got random quote from database query -->', result[0].quote);
+          callback(null, result[0].quote);
+        }
+      });
+    }
+  });
+};
+
+// add my new quote to the db
+var addNewQuote = (newQuote, callback) => {
+  var queryparam = [newQuote];
+  var querystring = "INSERT INTO quoteList(quote) VALUES (?)";
+  connection.query(querystring, queryparam,(err, result) => {
+    if (err) {
+      console.log('Error INSERTING new quote into database-->', err);
+      callback(err, null);
+    } else {
+      console.log('Successfully INSERTED new quote into database -->', result);
+      callback(null, result);
     }
   });
 };
 
 
 //exports
-
 module.exports = {
   getRandQuote,
   addNewQuote

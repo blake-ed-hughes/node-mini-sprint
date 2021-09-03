@@ -7,46 +7,41 @@ class App extends React.Component{
     super(props);
     this.state = {
 
-      randomQuote: [],
       formInputText: ''
-
     };
-     //bind form handlers
-     this.handleInputChange = this.handleInputChange.bind(this);
-     this.handleSubmitClick = this.handleSubmitClick.bind(this);
+    //bind form handlers
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleSubmitClick = this.handleSubmitClick.bind(this);
   }
 
   // form event handlers
   handleInputChange(event) {
 
     this.setState({formInputText: event.target.value});
-
   }
 
   handleSubmitClick(event) {
-
-    // event.preventDefault();
+    // event.preventDefault(); <- only on submission forms
+    var submission = this.state.formInputText;
 
     // post request to render when submitted
-    axios.post('http://localhost:3000/quote', this.state.formInputText, {
-      headers: {'Content-Type': 'text/plain'},
+    axios.post('http://localhost:3000/quote', {inputText: submission})
+      .then(resultOfSuccessfulPost => {
+        console.log('HERE IS THE POST DATA--> ', resultOfSuccessfulPost.data);
 
-    })
-      .then(res => {
-        console.log('HERE IS THE POST DATA--> ', res.data);
+        this.setState({formInputText: ''});
       })
       .catch((error) => {
         console.log(error);
       });
-
   }
 
   // get request to render data upon loading
   componentDidMount() {
     axios.get('http://localhost:3000/quote')
-      .then(res => {
-        console.log('HERE IS THE GET DATA--> ', res.data);
-        var aRandomQuote = res.data;
+      .then(resultOfSuccessfulGetRequest => {
+        console.log('HERE IS THE GET DATA--> ', resultOfSuccessfulGetRequest.data);
+        var aRandomQuote = resultOfSuccessfulGetRequest.data;
         this.setState({
           randomQuote: aRandomQuote,
           formInputText: ''
@@ -63,8 +58,8 @@ class App extends React.Component{
       <div>
         <h1>Blake's Random Quote Generator</h1>
         <div>
-          <input type="text" value={this.state.formInputText} onChange={this.handleInputChange.bind(this)}/>
-          <button onClick={this.handleSubmitClick.bind(this)}>
+          <input type="text" value={this.state.formInputText} onChange={this.handleInputChange}/>
+          <button onClick={this.handleSubmitClick}>
             Submit
           </button>
         </div>
